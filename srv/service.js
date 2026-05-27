@@ -313,7 +313,7 @@ module.exports = cds.service.impl(async function () {
     // AUTO-FILL EMPLOYEE AND TODAY'S DATE
     this.before('NEW','ExpenseClaims.drafts',async(req)=>{
         req.data.employee_ID = req.user.id;
-        req.data.claimDate = new Date().toISOString().slice(0,10);
+        req.data.claimDate = new Date()//.toISOString().slice(0,10);
     })
 
 

@@ -48,8 +48,13 @@ service ExpenseService {
             to   : ['Administrator']
         },
         {
-            grant: ['*'],
-            to   : ['Employee']
+            grant: ['READ','UPDATE','DELETE'],
+            to   : ['Employee'],
+            //where: 'createdBy = req.user.id'
+        },
+        {
+            grant: ['CREATE'],
+            to   : ['Employee'],
         }
     ]
     entity ExpenseClaims    as projection on db.ExpenseClaims

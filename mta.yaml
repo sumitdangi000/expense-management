@@ -36,7 +36,7 @@ modules:
       buildpack: nodejs_buildpack
     requires:
       - name: expense-management-db
-  - name: expense-management
+  - name: expense-management-approuter
     type: approuter.nodejs
     path: app/router
     parameters:
