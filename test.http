@@ -1,0 +1,41 @@
+@url=http://localhost:4004/odata/v4
+
+###
+GET {{url}}/expense/ExpenseClaims
+Authorization: Basic Employee 123
+
+
+### -------------------------------------------------------- GET EMPLOYEES ----------------------------------------------------------
+GET {{url}}/expense/Employees
+Authorization: Basic Employee 123
+
+
+
+
+### ---------------------------------------------------------- SUBMIT CLAIM ----------------------------------------------------------
+POST {{url}}/expense/ExpenseClaims(ID='c1a1c001-0000-0000-0000-000000000001',IsActiveEntity=true)/submitClaim
+
+
+### ---------------------------------------------------------- APPROVE CLAIM ---------------------------------------------------------
+POST {{url}}/expense/approveClaim
+Content-Type: application/json
+
+{
+    "claimID":"c1a1c001-0000-0000-0000-000000000001"
+}
+
+### ---------------------------------------------------------- REJECT CLAIM ----------------------------------------------------------
+POST {{url}}/expense/rejectClaim
+Content-Type: application/json
+
+{
+    "claimID":"c1a1c001-0000-0000-0000-000000000001"
+}
+
+### --------------------------------------------------------- WITHDRAW CLAIM ----------------------------------------------------------
+POST {{url}}/expense/withdrawClaim
+Content-Type: application/json
+
+{
+    "claimID":"c1a1c001-0000-0000-0000-000000000001"
+}

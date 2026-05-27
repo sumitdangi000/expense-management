@@ -1,0 +1,102 @@
+{
+  "name": "expense-management",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@cap-js/hana": "^2",
+    "@sap-cloud-sdk/http-client": "^4.6.0",
+    "@sap-cloud-sdk/resilience": "^4.6.0",
+    "@sap/cds": "^9.9.1",
+    "@sap/xssec": "^4"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2.4",
+    "@sap/cds-dk": "^9",
+    "cds-plugin-ui5": "^0.13.0",
+    "eslint": "^8.57.1",
+    "mbt": "^1.2.29",
+    "rimraf": "^5.0.5"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "dev": "cds watch",
+    "watch-expense-portal": "cds watch --open expense.portal.expenseportal/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "watch-manager-dashboard": "cds watch --open managerdashboard/index.html?sap-ui-xx-viewCache=false --livereload false",
+    "undeploy": "cf undeploy expense-management --delete-services --delete-service-keys --delete-service-brokers",
+    "build": "rimraf resources mta_archives && mbt build --mtar archive",
+    "deploy": "cf deploy mta_archives/archive.mtar --retries 1",
+    "watch-finance-dashboard": "cds watch --open financedashboard/index.html?sap-ui-xx-viewCache=false --livereload false"
+  },
+  "cds": {
+    "features": {
+      "fiori_preview": true
+    },
+    "server": {
+      "index": true
+    },
+    "requires": {
+      "CurrencyAPI": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "CurrencyAPI"
+        }
+      },
+      "CurrencyAPILocal": {
+        "kind": "rest",
+        "credentials": {
+          "url": "https://api.frankfurter.app"
+        }
+      },
+      "[production]": {
+        "auth": "xsuaa"
+      },
+      "[development]": {
+        "auth": {
+          "kind": "mocked",
+          "users": {
+            "Employee": {
+              "password": "123",
+              "ID": "e1000000-0010-4000-c000-000000000011",
+              "name": "Sumit Dangi",
+              "email": "sumit.d@laderatechnology.com",
+              "roles": [
+                "Employee",
+                "Manager",
+                "Finance"
+              ]
+            },
+            "Finance": {
+              "password": "123",
+              "roles": [
+                "Finance"
+              ]
+            },
+            "Manager": {
+              "password": "123",
+              "roles": [
+                "Manager"
+              ]
+            },
+            "Admin": {
+              "password": "123",
+              "roles": [
+                "Administrator"
+              ]
+            }
+          }
+        }
+      },
+      "destinations": true,
+      "html5-repo": true,
+      "workzone": true
+    }
+  },
+  "sapux": [
+    "app/expense-portal",
+    "app/manager-dashboard",
+    "app/finance-dashboard"
+  ],
+  "workspaces": [
+    "app/*"
+  ]
+}

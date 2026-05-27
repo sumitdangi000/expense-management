@@ -1,0 +1,195 @@
+{
+	"_version": "1.83.0",
+	"sap.app": {
+		"id": "financedashboard",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.22.0",
+			"toolsId": "b3e58aa8-d168-4a28-bad9-ad7ffff9f79b"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/odata/v4/reimbursement/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.01"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"manager-dashboard-display": {
+					"semanticObject": "manager-dashboard",
+					"action": "display",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.148.0",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "financedashboard.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						""
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "FinanceDashboardList",
+					"target": "FinanceDashboardList"
+				},
+				{
+					"pattern": "FinanceDashboard({key}):?query:",
+					"name": "FinanceDashboardObjectPage",
+					"target": "FinanceDashboardObjectPage"
+				}
+			],
+			"targets": {
+				"FinanceDashboardList": {
+					"type": "Component",
+					"id": "FinanceDashboardList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/FinanceDashboard",
+							"variantManagement": "Page",
+							"navigation": {
+								"FinanceDashboard": {
+									"detail": {
+										"route": "FinanceDashboardObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "AnalyticalTable",
+										"selectionMode": "Multi"
+									}
+								}
+							},
+							"views": {
+								"paths": [
+									{
+										"primary": [
+											{
+												"annotationPath": "com.sap.vocabularies.UI.v1.Chart#alpChart"
+											}
+										],
+										"secondary": [
+											{
+												"annotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView"
+											}
+										],
+										"defaultPath": "both"
+									}
+								]
+							},
+							"initialLoad": "Enabled"
+						}
+					}
+				},
+				"FinanceDashboardObjectPage": {
+					"type": "Component",
+					"id": "FinanceDashboardObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/FinanceDashboard"
+						}
+					}
+				}
+			}
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "expensemanagement.service"
+	}
+}
