@@ -165,7 +165,7 @@ annotate ReimbursementService.FinanceDashboard with @(
         ],
     },
     UI.SelectionFields : [
-        departmentName,
+        
     ],
     UI.DataPoint #violationCount1 : {
         $Type : 'UI.DataPointType',
@@ -180,6 +180,22 @@ annotate ReimbursementService.FinanceDashboard with @(
         Criticality : (ReimbursementStatus = 'COMPLETED' ? 3 : ReimbursementStatus = 'PENDING' ? 2 : 0),
         CriticalityRepresentation:#WithoutIcon
 
+    },
+    UI.Chart #visualFilter1 : {
+        $Type : 'UI.ChartDefinitionType',
+        ChartType : #Bar,
+        Dimensions : [
+            departmentName,
+        ],
+        DynamicMeasures : [
+            '@Analytics.AggregatedProperty#claimTotal_sum',
+        ],
+    },
+    UI.PresentationVariant #visualFilter1 : {
+        $Type : 'UI.PresentationVariantType',
+        Visualizations : [
+            '@UI.Chart#visualFilter1',
+        ],
     },
 );
 
@@ -314,6 +330,18 @@ annotate ReimbursementService.FinanceDashboard with {
             ],
         },
         Common.ValueListWithFixedValues : true,
+        Common.ValueList #visualFilter : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'FinanceDashboard',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : departmentName,
+                    ValueListProperty : 'departmentName',
+                },
+            ],
+            PresentationVariantQualifier : 'visualFilter1',
+        },
     )
 };
 
@@ -364,4 +392,8 @@ annotate ReimbursementService.FinanceDashboard with @(
 
 );
 
+
+annotate ReimbursementService.FinanceDashboard with {
+    claimTotal @Measures.ISOCurrency : currency
+};
 

@@ -128,6 +128,16 @@
                     "type": "AnalyticalTable",
                     "selectionMode": "Multi"
                   }
+                },
+                "@com.sap.vocabularies.UI.v1.SelectionFields": {
+                  "filterFields": {
+                    "departmentName": {
+                      "visualFilter": {
+                        "valueList": "com.sap.vocabularies.Common.v1.ValueList#visualFilter"
+                      }
+                    }
+                  },
+                  "layout": "CompactVisual"
                 }
               },
               "views": {

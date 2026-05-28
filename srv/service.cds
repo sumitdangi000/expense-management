@@ -48,12 +48,7 @@ service ExpenseService {
             to   : ['Administrator']
         },
         {
-            grant: ['READ','UPDATE','DELETE'],
-            to   : ['Employee'],
-            //where: 'createdBy = req.user.id'
-        },
-        {
-            grant: ['CREATE'],
+            grant: ['*'],
             to   : ['Employee'],
         }
     ]
@@ -94,7 +89,7 @@ service ExpenseService {
         {
             grant: ['*'],
             to   : ['Employee']
-        } //,where : 'req.user.ID = employee_ID'}
+        } 
     ]
     entity ExpenseItems     as projection on db.ExpenseItems;
 
@@ -155,26 +150,26 @@ service ReimbursementService {
     ]
     entity Reimbursements   as projection on db.Reimbursements;
 
-    function getPendingReimbursements() returns array of String;
+    function getPendingReimbursements() returns array of FinanceDashboard;
 
     @cds.redirection.target
     entity ExpenseClaims as projection on db.ExpenseClaims excluding {reimbursement};
 
-    @cds.redirection.target
-    @readonly
-    entity ExpenseItems     as projection on db.ExpenseItems;
+    // @cds.redirection.target
+    // @readonly
+    // entity ExpenseItems     as projection on db.ExpenseItems;
 
-    @readonly
-    entity Employees        as projection on db.Employees;
+    // @readonly
+    // entity Employees        as projection on db.Employees;
 
-    @readonly
-    entity Managers         as projection on db.Managers;
+    // @readonly
+    // entity Managers         as projection on db.Managers;
 
-    @readonly
-    entity Departments      as projection on db.Departments;
+    // @readonly
+    // entity Departments      as projection on db.Departments;
 
-    @readonly
-    entity Currency         as projection on db.Currency;
+    // @readonly
+    // entity Currency         as projection on db.Currency;
 
     entity statusView       as projection on db.statusView;
 

@@ -89,12 +89,17 @@ module.exports = cds.service.impl(async function () {
 
     // RESTRICT FINANCE-DASHBOARD VIEW
     this.before('READ', FinanceDashboard, (req) => {
-        req.query.where({status: ['APPROVED', 'PAID'] });
+        req.query.where({ status: ['APPROVED', 'PAID'] });
     });
 
 
     // RESTRICT EMPLOYEE VIEW: Employees only see their own claims in the Portal
     this.before('READ', ExpenseClaims, (req) => {
+        if (req.user.is('Employee') && !req.user.is('Administrator')) {
+            req.query.where({ createdBy: req.user.id });
+        }
+    });
+    this.before('READ', ExpenseItems, (req) => {
         if (req.user.is('Employee') && !req.user.is('Administrator')) {
             req.query.where({ createdBy: req.user.id });
         }
@@ -108,7 +113,7 @@ module.exports = cds.service.impl(async function () {
             employees.forEach(emp => delete emp.bankAccount);
         }
     });
-    
+
 
     // BEFORE DELETE EXPENSE CLAIMS
     this.before('DELETE', ExpenseClaims, async (req) => {
@@ -124,7 +129,7 @@ module.exports = cds.service.impl(async function () {
         const claimID = req.data.ID || req.params?.[0]?.ID;
         const claim = await SELECT.one.from(ExpenseClaims).where({ ID: claimID });
         if (!claim) return req.reject(404, `Claim not found for claimID ${claimID}`);
-        if (claim.status !== 'DRAFT') return req.reject(400,`Only DRAFT claims can be updated. Current status: ${claim.status}`)
+        if (claim.status !== 'DRAFT') return req.reject(400, `Only DRAFT claims can be updated. Current status: ${claim.status}`)
         const { items } = req.data;
         if (!items || items.length === 0) return;
         const { hasViolation, violationCount, reasons } = await validateItems(items);
@@ -172,7 +177,7 @@ module.exports = cds.service.impl(async function () {
                 modifiedAt: new Date()
             })
             .where({ ID: claimID });
-            return await SELECT.from(ExpenseClaims)
+        return await SELECT.from(ExpenseClaims)
     });
 
 
@@ -244,17 +249,17 @@ module.exports = cds.service.impl(async function () {
         }
         const reimbursement = await SELECT.one.from(Reimbursements).where({ claim_ID: claimID });
         if (!reimbursement) return req.reject(404, 'Reimbursement record not found');
-        if (reimbursement.status !== 'PENDING') return req.reject(400,`Reimbursement already ${reimbursement.status}`);
+        if (reimbursement.status !== 'PENDING') return req.reject(400, `Reimbursement already ${reimbursement.status}`);
     });
 
 
     // PROCESS REIMBURSEMENT
     this.on('processReimbursement', async (req) => {
         const params = req.params?.[0];
-        const claimID = params.claimID 
+        const claimID = params.claimID
         const paymentRef = `PAY-${Date.now()}`;
-        await UPDATE(Reimbursements).set({processedDate: new Date(),paymentRef,status: 'COMPLETED'}).where({ claim_ID: claimID });
-        await UPDATE(ExpenseClaims).set({status: 'PAID'}).where({ ID: claimID });
+        await UPDATE(Reimbursements).set({ processedDate: new Date(), paymentRef, status: 'COMPLETED' }).where({ claim_ID: claimID });
+        await UPDATE(ExpenseClaims).set({ status: 'PAID' }).where({ ID: claimID });
         req.notify(`Payment processed for claim ${claimID}.`);
         return `Payment processed for claim ${claimID}.`;
     });
@@ -266,7 +271,7 @@ module.exports = cds.service.impl(async function () {
             .where({ status: 'APPROVED' })
             .and('claimID not in', SELECT.from(Reimbursements).columns('claim_ID'));
         console.log(response);
-        return response  
+        return response
     });
 
 
@@ -285,11 +290,11 @@ module.exports = cds.service.impl(async function () {
 
     // BEFORE CREATE EXPENSE CLAIMS
     this.before('CREATE', ExpenseClaims, async (req) => {
-        const { items,claimDate } = req.data;
-        if(claimDate>(new Date().toISOString().slice(0,10))) req.reject(400,"Future Claim Date is not allowed")
-        console.log("req user data: ",req.user);
+        const { items, claimDate } = req.data;
+        if (claimDate > (new Date().toISOString().slice(0, 10))) req.reject(400, "Future Claim Date is not allowed")
+        console.log("req user data: ", req.user);
         req.data.employee_ID = req.user.id;
-        console.log("employee ID auto filled: ",req.data.employee_ID);
+        console.log("employee ID auto filled: ", req.data.employee_ID);
         if (!items || items.length === 0) return;
         const { hasViolation, violationCount, reasons } = await validateItems(items);
         req.data.policyViolation = hasViolation;
@@ -301,17 +306,17 @@ module.exports = cds.service.impl(async function () {
 
 
     // BEFORE CREATE EXPENSE ITEMS
-    this.on('CREATE',ExpenseItems,async(req)=>{
-        const {claimID,expenseDate} = req.data;
-        console.log("items:",claimID);
-        const claim = await SELECT.one.from(ExpenseClaims).where({ID:claimID});
-        if(!claim) req.reject(400,"No claim found")
-        if(claim.claimDate<expenseDate) req.reject(400,"Expense Date must be older or equal to Claim Date") 
+    this.on('CREATE', ExpenseItems, async (req) => {
+        const { claimID, expenseDate } = req.data;
+        console.log("items:", claimID);
+        const claim = await SELECT.one.from(ExpenseClaims).where({ ID: claimID });
+        if (!claim) req.reject(400, "No claim found")
+        if (claim.claimDate < expenseDate) req.reject(400, "Expense Date must be older or equal to Claim Date")
     })
 
 
     // AUTO-FILL EMPLOYEE AND TODAY'S DATE
-    this.before('NEW','ExpenseClaims.drafts',async(req)=>{
+    this.before('NEW', 'ExpenseClaims.drafts', async (req) => {
         req.data.employee_ID = req.user.id;
         req.data.claimDate = new Date()//.toISOString().slice(0,10);
     })
@@ -332,13 +337,25 @@ module.exports = cds.service.impl(async function () {
 
 
     // FUNCTION TO GET USER DETAILS
-    this.on('getUserInfo',async(req)=>{
+    this.on('getUserInfo', async (req) => {
         console.log(req.user);
         const roles = Object.keys(req.user.roles);
-        return(`User ID : ${req.user.id}
+        return (`User ID : ${req.user.id}
                 Name : ${req.user.name}
                 Email : ${req.user.email}
                 Roles : ${roles.join(',')}`)
     })
+
+    async function updateClaimStats(claimID) {
+        const items = await SELECT.from(ExpenseItems).where({ claim_ID: claimID });
+        const itemCount = items.length;
+        const violationItemCount = items.filter(item => item.policyViolation).length;
+        await UPDATE(ExpenseClaims).set({ itemCount, violationItemCount }).where({ ID: claimID });
+    }
+
+    this.after('SAVE', ExpenseClaims, async (data) => {
+    await updateClaimStats(data.ID);
+});
+
 });
 

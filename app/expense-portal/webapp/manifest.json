@@ -94,7 +94,13 @@
       "css": []
     },
     "routing": {
-      "config": {},
+      "config": {
+        "flexibleColumnLayout": {
+          "defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+          "defaultThreeColumnLayoutType": "ThreeColumnsMidExpanded"
+        },
+        "routerClass": "sap.f.routing.Router"
+      },
       "routes": [
         {
           "pattern": ":?query:",
@@ -136,13 +142,23 @@
                       "sort": true
                     }
                   },
-                  "actions": {}
+                  "columns": {
+                    "DataFieldForAnnotation::DataPoint::violationCount": {
+                      "width":"15rem"
+                    },
+                    "DataField::status": {
+                      "width":"10rem",
+                      "horizontalAlign": "Center"
+                    }
+                  }
                 }
               },
               "defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#tableView",
               "initialLoad": "Enabled"
             }
-          }
+          },
+          "controlAggregation": "beginColumnPages",
+          "contextPattern": ""
         },
         "ExpenseClaimsObjectPage": {
           "type": "Component",
@@ -154,9 +170,17 @@
               "contextPath": "/ExpenseClaims",
               "navigation": {}
             }
-          }
+          },
+          "controlAggregation": "midColumnPages",
+          "contextPattern": "/ExpenseClaims({key})"
         }
       }
+    },
+    "rootView": {
+      "viewName": "sap.fe.templates.RootContainer.view.Fcl",
+      "type": "XML",
+      "async": true,
+      "id": "appRootView"
     }
   },
   "sap.fiori": {

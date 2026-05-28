@@ -133,6 +133,19 @@
                   "tableSettings": {
                     "type": "ResponsiveTable"
                   },
+                  "columns": {
+                    "DataField::employee_empNo": {
+                      "width":"5rem"
+                    },
+                    "DataField::status": {
+                      "width":"10rem",
+                      "horizontalAlign": "Center"
+                    },
+                    "DataField::policyViolation": {
+                      "width":"10rem",
+                      "horizontalAlign": "Center"
+                    }
+                  },
                   "actions": {
                     "DataFieldForAction::ExpenseService.approveClaim": {
                       "enableOnSelect": "single"

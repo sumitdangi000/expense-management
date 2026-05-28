@@ -29,7 +29,9 @@ annotate service.ExpenseClaims with @(
                 $Type        : 'UI.DataField',
                 Value        : violationMessage,
                 Label        : 'Violation Reasons',
-                ![@UI.Hidden]: (policyViolation = false)
+                ![@UI.Hidden]: (policyViolation = false),
+                Criticality : 1,
+                CriticalityRepresentation:#WithoutIcon
             },
         ],
     },
@@ -89,10 +91,15 @@ annotate service.ExpenseClaims with @(
             Criticality : (status = 'DRAFT' ? 5 : status = 'PAID' ? 4 : status = 'APPROVED' ? 3 : status = 'SUBMITTED' ? 2 : status = 'REJECTED' ? 1 : 0)
         },
         {
-            $Type       : 'UI.DataField',
-            Value       : policyViolation,
-            Label       : 'Policy Violation',
-            Criticality : (policyViolation = true ? 1 : policyViolation = false ? 3 : 0)
+            $Type : 'UI.DataFieldForAnnotation',
+            Target : '@UI.DataPoint#violationCount',
+            Label : 'Policy Violation',
+            @UI.Importance : #High,
+
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : modifiedAt,
         },
 
 
@@ -146,6 +153,7 @@ annotate service.ExpenseClaims with @(
             $Type: 'UI.DataField',
             Value: violationMessage,
             Label: 'Violation Reasons',
+            
         }, ],
     },
     UI.FieldGroup #Itemdetails       : {
@@ -251,6 +259,13 @@ annotate service.ExpenseClaims with @(
         },
         Text : 'Table View 1',
     },
+    UI.DataPoint #violationCount : {
+        Value : violationItemCount,
+        Visualization : #Progress,
+        TargetValue : itemCount,
+        Criticality : (violationItemCount>0?1:3),
+        CriticalityRepresentation:#WithoutIcon
+    },
 );
 
 annotate service.ExpenseClaims with {
@@ -312,18 +327,20 @@ annotate service.ExpenseClaims with {
 annotate service.ExpenseClaims with {
     status @(
         Common.Label                   : 'Status',
-        Common.ValueList               : {
-            $Type         : 'Common.ValueListType',
-            CollectionPath: 'statusView',
-            Parameters    : [{
-                $Type            : 'Common.ValueListParameterInOut',
-                LocalDataProperty: status,
-                ValueListProperty: 'status',
-            }, ],
-        },
-        Common.ValueListWithFixedValues: true,
         Common.FieldControl            : #ReadOnly,
-        Criticality                    : (status = 'DRAFT' ? 5 : status = 'PAID' ? 4 : status = 'APPROVED' ? 3 : status = 'SUBMITTED' ? 2 : status = 'REJECTED' ? 1 : 0)
+        Criticality                    : (status = 'DRAFT' ? 5 : status = 'PAID' ? 4 : status = 'APPROVED' ? 3 : status = 'SUBMITTED' ? 2 : status = 'REJECTED' ? 1 : 0),
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'statusView',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : status,
+                    ValueListProperty : 'status',
+                },
+            ],
+        },
+        Common.ValueListWithFixedValues : true,
     )
 };
 
@@ -433,6 +450,25 @@ annotate service.ExpenseItems with @(
             Criticality : (policyViolation = true ? 1 : policyViolation = false ? 3 : 0)
         },
     ],
+    UI.DataPoint #amount1 : {
+        Value : amount,
+    },
+    UI.Chart #amount1 : {
+        ChartType : #Area,
+        Measures : [
+            amount,
+        ],
+        MeasureAttributes : [
+            {
+                DataPoint : '@UI.DataPoint#amount1',
+                Role : #Axis1,
+                Measure : amount,
+            },
+        ],
+        Dimensions : [
+            amount,
+        ],
+    },
 );
 
 annotate service.ExpenseItems with {
@@ -514,23 +550,6 @@ annotate service.ExpenseClaims with @(
         Title       : 'Policy Violations',
         Description : 'Claims with at least one policy breach',
         Criticality : (violationCount = 0 ? 3 : violationCount > 0 ? 1 : 0),
-        CriticalityCalculation : {
-            $Type                    : 'UI.CriticalityCalculationType',
-            ImprovementDirection     : #Minimize,
-            AcceptanceRangeLowValue  : 0,
-            AcceptanceRangeHighValue : 0,
-            ToleranceRangeLowValue   : 1,
-            ToleranceRangeHighValue  : 2,
-            DeviationRangeLowValue   : 3,
-            DeviationRangeHighValue  : 9999,
-        },
-        TrendCalculation : {
-            $Type                : 'UI.TrendCalculationType',
-            ReferenceValue       : 10,
-            IsRelativeDifference : true,
-            UpDifference         : 0.2,
-            DownDifference       : -0.2,
-        },
     },
 
     UI.DataPoint #StatusKPI : {
