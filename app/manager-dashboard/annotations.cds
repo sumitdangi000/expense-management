@@ -314,23 +314,6 @@ annotate service.ManagerDashboard with @(
         Title       : 'Policy Violations',
         Description : 'Claims with at least one policy breach',
         Criticality : (violationCount = 0 ? 3 : violationCount > 0 ? 1 : 0),
-        CriticalityCalculation : {
-            $Type                    : 'UI.CriticalityCalculationType',
-            ImprovementDirection     : #Minimize,
-            AcceptanceRangeLowValue  : 0,
-            AcceptanceRangeHighValue : 0,
-            ToleranceRangeLowValue   : 1,
-            ToleranceRangeHighValue  : 2,
-            DeviationRangeLowValue   : 3,
-            DeviationRangeHighValue  : 9999,
-        },
-        TrendCalculation : {
-            $Type                : 'UI.TrendCalculationType',
-            ReferenceValue       : 10,
-            IsRelativeDifference : true,
-            UpDifference         : 0.2,
-            DownDifference       : -0.2,
-        },
     },
 
     UI.DataPoint #StatusKPI : {

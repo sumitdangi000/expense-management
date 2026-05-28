@@ -1,4 +1,3 @@
-using ExpenseService as service from '../../srv/service';
 using from '../../srv/service';
 
 annotate ReimbursementService.FinanceDashboard with @(

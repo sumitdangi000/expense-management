@@ -266,11 +266,17 @@ module.exports = cds.service.impl(async function () {
 
 
     // GET PENDING REIMBURSEMENTS
+    // this.on('getPendingReimbursements', async () => {
+    //     const response = await SELECT.from(FinanceDashboard)
+    //         .where({ status: 'APPROVED' })
+    //         .and('claimID not in', SELECT.from(Reimbursements).columns('claim_ID'));
+    //     console.log(response);
+    //     return response
+    // });
     this.on('getPendingReimbursements', async () => {
-        const response = await SELECT.from(FinanceDashboard)
+        const response = await SELECT.one.from(FinanceDashboard)
             .where({ status: 'APPROVED' })
-            .and('claimID not in', SELECT.from(Reimbursements).columns('claim_ID'));
-        console.log(response);
+        //console.log(response);
         return response
     });
 
